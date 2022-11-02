@@ -118,7 +118,11 @@ Program output:
 
 ## 原始类型 - field element ( felt )
 
-在 Cairo 中, 当您不指定变量/参数的类型时, 那么它的类型就是 **field element** ( 用关键字 `felt` 表示 ). 在 Cairo 的概念里, 当我们说 “a field element” , 我们想要表达的是
+在 Cairo 中, 当你不指定变量/参数的类型时, 那么它的类型就是 **field element** ( 用关键字 `felt` 表示 ). 在 Cairo 的概念里, 当我们说 “一个 field element” , 我们指的是一个在 <img src="./assets/Cairo/Programming_in_Cairo/1.svg" /> 范围内的整数，其中 <img src="./assets/Cairo/Programming_in_Cairo/2.svg" /> 是一个非常大的 ( 素数 ) 数 ( 目前它是一个 252 位 ( 252-bit ) 的数, 也就是说需要 76 位的十进制来表示它  ) . 当我们进行加、减或乘的操作, 运算结果超出上述范围而发生溢出时,  这时 Cairo 会将结果与  <img src="./assets/Cairo/Programming_in_Cairo/2.svg" />  的适当倍数相加或相减, 使其回到这个范围内 ( 换句话说，最总结果是将计算结果经由与 <img src="./assets/Cairo/Programming_in_Cairo/2.svg" /> 进行取模计算得来的 ) . 
+
+**除法**是整数 ( integers ) 和 field elements 之间最主要的区别： field elements 的除法 ( 也就是 Cairo 中的除法 ) 不是许多编程语言中的整数除法, 计算结果中商的整数部分 ( 通常情况下 `7 / 3 = 2` , 因此你会得到 2 ) . 只要分子一直是分母的倍数，那么它的行为就会想你期待的那样 ( `6 / 3 = 2` ) . 反之, 例如当我们计算 `7/3` 时, 它将返回一个 field element `x`, 而这个 `x` 满足 `3 * x = 7`  . 注意它不会是 `2.3333`, 因为 `x` 必须是整数. 如果你认为这不可能, 请记住, 一旦 `3 * x` 超出 <img src="./assets/Cairo/Programming_in_Cairo/1.svg" /> 的范围，就会发生溢出，而导致溢出会使结果减少到 7. 在数学中, 除非分母为零, 总会有一个值 `x` 满足 `分母 * x = 分子` . 
+
+事不宜迟! 让我们将 `array_sum.cairo` 里的代码改成: 
 
 ```
 %builtins output
@@ -132,9 +136,17 @@ func main{output_ptr: felt*}() {
 }
 ```
 
+使用我们之前的命令来运行它 ( 别忘了重新编译, 否则你会得到之前的结果 ). 如果一切顺利你将得到: 
 
+```
+Program output:
+  2
+  1206167596222043737899107594365023368541035738443865566657697352045290673496
+```
 
+现在, 修改代码将打印出来的最后一行的数字乘以 3 并把结果打印出来, 来确认你的计算结果确实为 7.
 
+你会发现, 在你大部分代码中 ( 除非你的代码有很多代数 )  的那些值的类型虽然在 Cairo 概念中的是 field elements , 但是你依旧可以将其看作是普通的整数.  
 
 ## 使用 array_sum()
 
